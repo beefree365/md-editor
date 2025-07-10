@@ -81,6 +81,14 @@ graph TD
     D --> E[结束];
 ```
 
+## 数学公式 (KaTeX)
+
+这是一个使用 KaTeX 渲染的公式：
+
+$latex
+\frac{\partial u}{\partial t} = \alpha \nabla^2 u
+$
+
 ---
 
 **注意**: 流程图的显示效果取决于您使用的 Markdown 查看器或编辑器是否支持 Mermaid.js 语法。在像 Typora、Obsidian 或启用了相应插件的 VS Code 中，它会被渲染成一个图形。
