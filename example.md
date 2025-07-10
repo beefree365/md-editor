@@ -41,8 +41,10 @@ function bubbleSort(arr) {
 const numbers = [5, 3, 8, 4, 2];
 console.log('排序后的数组:', bubbleSort(numbers));
 ```
+## 公式
+$E=mc^2$
 
-## uml
+## UML
 $$uml
 partition Conductor {
   (*) --> "Climbs on Platform"
