@@ -85,7 +85,7 @@ graph TD
 
 这是一个使用 KaTeX 渲染的公式：
 
-$latex
+$
 \frac{\partial u}{\partial t} = \alpha \nabla^2 u
 $
 
