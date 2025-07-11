@@ -6,7 +6,7 @@
 
 下面是一个示例图片：
 
-![占位图](https://via.placeholder.com/400x200 "这是一个占位图")
+![](https://raw.githubusercontent.com/ddnbb/picbed/main/img/20250711095109594.png)
 
 ## 表格
 
