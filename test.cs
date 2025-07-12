@@ -3,22 +3,16 @@ public void Calculate(List<double> prices, List<DateTime> times)
     IsValid = false;
 
     if (prices == null || times == null)
-    {
-        throw new ArgumentNullException("prices or times");
-    }
+        throw new ArgumentNullException(nameof(prices) + " 或 " + nameof(times));
 
     int n = prices.Count;
     if (times.Count != n)
-    {
-        throw new ArgumentException("Length mismatch");
-    }
+        throw new ArgumentException("prices 和 times 的长度不匹配");
 
     if (n == 0)
     {
-        Slope = 0;
-        Intercept = 0;
-        StartPoint = default(PricePoint);
-        EndPoint = default(PricePoint);
+        Slope = Intercept = 0;
+        StartPoint = EndPoint = default;
         return;
     }
 
@@ -32,20 +26,26 @@ public void Calculate(List<double> prices, List<DateTime> times)
         return;
     }
 
+    // 验证价格和时间
     for (int i = 0; i < n; i++)
     {
         if (double.IsNaN(prices[i]) || double.IsInfinity(prices[i]))
         {
-            Slope = double.NaN;
-            Intercept = double.NaN;
-            StartPoint = default(PricePoint);
-            EndPoint = default(PricePoint);
+            Slope = Intercept = double.NaN;
+            StartPoint = EndPoint = default;
             return;
         }
+        if (times[i] == DateTime.MinValue || times[i] == DateTime.MaxValue)
+            throw new ArgumentException("times 包含无效的 DateTime 值");
     }
 
+    // 验证时间升序
+    for (int i = 1; i < n; i++)
+        if (times[i] < times[i - 1])
+            throw new ArgumentException("times 必须按升序排列");
+
+    // 使用 TotalMilliseconds 处理短时间跨度
     double[] x = new double[n];
-    double[] y = prices.ToArray();
     DateTime baseTime = times[0];
     bool allTimesEqual = true;
     for (int i = 1; i < n; i++)
@@ -56,14 +56,11 @@ public void Calculate(List<double> prices, List<DateTime> times)
             break;
         }
     }
+
     if (allTimesEqual)
     {
         Slope = 0;
-        double sum = 0;
-        for (int i = 0; i < n; i++)
-        {
-            sum += prices[i];
-        }
+        double sum = prices.Sum();
         Intercept = sum / n;
         StartPoint = new PricePoint(times[0], Intercept);
         EndPoint = StartPoint;
@@ -74,21 +71,18 @@ public void Calculate(List<double> prices, List<DateTime> times)
     double sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
     for (int i = 0; i < n; i++)
     {
-        x[i] = (times[i] - baseTime).TotalSeconds;
-        y[i] = prices[i];
+        x[i] = (times[i] - baseTime).TotalMilliseconds; // 使用毫秒
         sumX += x[i];
-        sumY += y[i];
-        sumXY += x[i] * y[i];
+        sumY += prices[i];
+        sumXY += x[i] * prices[i];
         sumXX += x[i] * x[i];
     }
 
     double denominator = n * sumXX - sumX * sumX;
-    if (Math.Abs(denominator) < 1e-9)
+    if (Math.Abs(denominator) < 1e-10 * Math.Max(1.0, Math.Abs(sumXX)))
     {
-        Slope = double.NaN;
-        Intercept = double.NaN;
-        StartPoint = default(PricePoint);
-        EndPoint = default(PricePoint);
+        Slope = Intercept = double.NaN;
+        StartPoint = EndPoint = default;
         return;
     }
 
